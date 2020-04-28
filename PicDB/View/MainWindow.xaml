@@ -46,7 +46,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg"/>
+                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding SelectedImageSource, Mode=TwoWay}"/>
                 <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="8">
                     <GridSplitter.Template>
                         <ControlTemplate TargetType="{x:Type GridSplitter}">
@@ -100,26 +100,17 @@
                     </ControlTemplate>
                 </GridSplitter.Template>
             </GridSplitter>
-            <ListBox Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <ListBox Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding ImageProps}" IsSynchronizedWithCurrentItem="True">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Rows="1" Columns="50"/>
-                        <!--dynamic count-->
+                        <UniformGrid Rows="1" Columns="{Binding ThumbnailCount, Mode=TwoWay}"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-                <Image Source="https://cdn.mobilesyrup.com/wp-content/uploads/2019/01/mocking-spongebob.jpg" Width="100"/>
-
-
             </ListBox>
         </Grid>
     </DockPanel>
