@@ -9,9 +9,9 @@ namespace PicDB.DataAccess
     class DALDatabase : IDAL
     {
         
-        private static readonly SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\gashe\\work\\sem4\\swe2\\PicDB\\PicDB\\Database.mdf;Integrated Security=True");
+        private static readonly SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\gashe\\work\\sem4\\swe2\\PicDB\\PicDB\\Database.mdf;Integrated Security=True;MultipleActiveResultSets=true");
 
-        public void addPicture(Picture p)
+        public void savePicture(Picture p)
         {
             string query = "INSERT INTO Picture (Id, Name, Image) OUTPUT INSERTED.Id " + "VALUES (NEWID(), @name, @image); ";
             connection.Open();
@@ -68,7 +68,7 @@ namespace PicDB.DataAccess
         public Picture getPictureById(Guid ID)
         {
             Picture p = new Picture();
-            Guid photographerId;
+            Guid photographerId; //TODO: GetPhotographerById and add to Picture Object
             string query = "SELECT * from Picture WHERE Id = " + "@id";
             connection.Open();
 
@@ -128,19 +128,31 @@ namespace PicDB.DataAccess
                 return properties;
         }
 
-        public List<Picture> getPictures()
+        public IList<Picture> getAllPictures()
         {
-            throw new NotImplementedException();
-        }
+            IList<Picture> pictures = new List<Picture>();
+            string query = "select * from Picture";
 
-        public void initialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void savePicture(Picture p)
-        {
-            throw new NotImplementedException();
+            connection.Open();
+            SqlCommand cmd = getCommand(query);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Picture p = new Picture();
+                    p.ID = reader.GetGuid(0);
+                    p.Name = reader.GetString(1);
+                    p.Image = reader.GetString(2);
+                    //if (!reader.IsDBNull(3))
+                    //{
+                    //    p.Photographer = getPhotographerById(reader.GetGuid(3)); //TODO: GetPhotographerById and add to Picture Object
+                    //}
+                    p.ExifProperties = GetExifPropertiesForPicture(p);
+                    pictures.Add(p);
+                }
+            }
+            connection.Close();
+            return pictures;
         }
     }
 }

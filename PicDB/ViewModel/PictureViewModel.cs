@@ -39,7 +39,8 @@ namespace PicDB.ViewModel
             p.ExifProperties = testProps;
             DALDatabase dALDatabase = new DALDatabase();
             // dALDatabase.addPicture(p);
-            dALDatabase.getPictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
+            //dALDatabase.getPictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
+            dALDatabase.getAllPictures();
 
             InitExifData();
             InitPictures();
