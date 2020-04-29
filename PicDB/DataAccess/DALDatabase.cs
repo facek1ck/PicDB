@@ -11,7 +11,7 @@ namespace PicDB.DataAccess
         
         private static readonly SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\gashe\\work\\sem4\\swe2\\PicDB\\PicDB\\Database.mdf;Integrated Security=True;MultipleActiveResultSets=true");
 
-        public void savePicture(Picture p)
+        public void SavePicture(Picture p)
         {
             string query = "INSERT INTO Picture (Id, Name, Image) OUTPUT INSERTED.Id " + "VALUES (NEWID(), @name, @image); ";
             connection.Open();
@@ -60,12 +60,42 @@ namespace PicDB.DataAccess
            return new SqlCommand(query, connection);
         }
 
-        public void deletePicture(Picture p)
+        public void DeletePictureById(Guid ID)
         {
-            throw new NotImplementedException();
+            Picture p = new Picture();
+            p.ID = ID;
+            IList<Guid> exifPropIds = new List<Guid>();
+            string query = "delete from Picture WHERE Id = " + "@id";
+            connection.Open();
+            foreach (var exifProp in GetExifPropertiesForPicture(p))
+            {
+                exifPropIds.Add(exifProp.ID);
+            }
+            deleteExifPropertiesToPictureMatchers(ID);
+            deleteExifPropertiesForPicture(exifPropIds);
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@id", ID);
+            cmd.ExecuteNonQuery();
+            connection.Close();
         }
 
-        public Picture getPictureById(Guid ID)
+        private void deleteExifPropertiesToPictureMatchers(Guid ID)
+        {
+            string query = "delete from PictureExifData WHERE PictureID = " + "@id";
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@id", ID);
+            cmd.ExecuteNonQuery();
+        }
+
+        private void deleteExifPropertiesForPicture(IList<Guid> Ids)
+        {
+            string query = "delete from ExifData WHERE Id in ({@id})";
+            SqlCommand cmd = getCommand(query);
+            cmd.AddArrayParameters("@id", Ids);
+            cmd.ExecuteNonQuery();
+        }
+
+        public Picture GetPictureById(Guid ID)
         {
             Picture p = new Picture();
             string query = "SELECT * from Picture WHERE Id = " + "@id";
@@ -127,7 +157,7 @@ namespace PicDB.DataAccess
                 return properties;
         }
 
-        public IList<Picture> getAllPictures()
+        public IList<Picture> GetAllPictures()
         {
             IList<Picture> pictures = new List<Picture>();
             string query = "select * from Picture";
@@ -227,6 +257,16 @@ namespace PicDB.DataAccess
 
             cmd.ExecuteNonQuery();
 
+            connection.Close();
+        }
+
+        public void DeletePhotographerById(Guid ID)
+        {
+            string query = "delete from Photographer WHERE Id = " + "@id";
+            connection.Open();
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@id", ID);
+            cmd.ExecuteNonQuery();
             connection.Close();
         }
     }

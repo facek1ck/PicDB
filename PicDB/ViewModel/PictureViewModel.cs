@@ -21,7 +21,7 @@ namespace PicDB.ViewModel
             ListBoxThumbnails = new DataGrid().Items;
             InitExifData();
             InitPictures();
-            //TestMethod();
+            TestMethod();
         }
 
         private void TestMethod()
@@ -60,6 +60,8 @@ namespace PicDB.ViewModel
             //dALDatabase.SavePhotographer(photographer2);
             //dALDatabase.GetAllPhotographers();
             //dALDatabase.GetPhotographerById(new Guid("212839F0-ED3C-43B3-BE5E-446159D94DF1"));
+            //dALDatabase.DeletePhotographerById(new Guid("60E3680B-B92A-478A-874F-F4F2E5228E5A"));
+            dALDatabase.DeletePictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
         }
 
         private void InitPictures()

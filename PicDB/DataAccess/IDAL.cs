@@ -7,13 +7,14 @@ namespace PicDB.DataAccess
 {
      interface IDAL
     {
-        IList<Picture> getAllPictures();
-        Picture getPictureById(Guid ID);
-        void savePicture(Picture p);
-        void deletePicture(Picture p);
+        IList<Picture> GetAllPictures();
+        Picture GetPictureById(Guid ID);
+        void SavePicture(Picture p);
+        void DeletePictureById(Guid ID);
         IList<Photographer> GetAllPhotographers();
         Photographer GetPhotographerById(Guid id);
         void SavePhotographer(Photographer p);
+        void DeletePhotographerById(Guid ID);
 
     }
 }
