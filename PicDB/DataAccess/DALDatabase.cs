@@ -68,7 +68,6 @@ namespace PicDB.DataAccess
         public Picture getPictureById(Guid ID)
         {
             Picture p = new Picture();
-            Guid photographerId; //TODO: GetPhotographerById and add to Picture Object
             string query = "SELECT * from Picture WHERE Id = " + "@id";
             connection.Open();
 
@@ -83,7 +82,7 @@ namespace PicDB.DataAccess
                     p.Image = reader.GetString(2);
                     if (!reader.IsDBNull(3))
                     {
-                        photographerId = reader.GetGuid(3);
+                        p.Photographer = GetPhotographerById(reader.GetGuid(3));
                     }
                 }
             }
@@ -143,16 +142,92 @@ namespace PicDB.DataAccess
                     p.ID = reader.GetGuid(0);
                     p.Name = reader.GetString(1);
                     p.Image = reader.GetString(2);
-                    //if (!reader.IsDBNull(3))
-                    //{
-                    //    p.Photographer = getPhotographerById(reader.GetGuid(3)); //TODO: GetPhotographerById and add to Picture Object
-                    //}
+                    if (!reader.IsDBNull(3))
+                    {
+                        p.Photographer = GetPhotographerById(reader.GetGuid(3));
+                    }
                     p.ExifProperties = GetExifPropertiesForPicture(p);
                     pictures.Add(p);
                 }
             }
             connection.Close();
             return pictures;
+        }
+
+        public IList<Photographer> GetAllPhotographers()
+        {
+            IList<Photographer> photographers = new List<Photographer>();
+            string query = "select * from Photographer";
+
+            connection.Open();
+
+            SqlCommand cmd = getCommand(query);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Photographer p = new Photographer();
+                    p.ID = reader.GetGuid(0);
+                    p.FirstName = reader.GetString(1);
+                    p.LastName = reader.GetString(2);
+                    if (!reader.IsDBNull(3))
+                    {
+                        p.Birthday = reader.GetDateTime(3);
+                    }
+                    photographers.Add(p);
+                }
+            }
+
+            connection.Close();
+            return photographers;
+        }
+
+        public Photographer GetPhotographerById(Guid ID)
+        {
+            Photographer p = new Photographer();
+            string query = "SELECT * from Photographer WHERE Id = " + "@id";
+            connection.Open();
+
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@id", ID);
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    p.ID = reader.GetGuid(0);
+                    p.FirstName = reader.GetString(1);
+                    p.LastName = reader.GetString(2);
+                    if (!reader.IsDBNull(3))
+                    {
+                        p.Birthday = reader.GetDateTime(3);
+                    }
+                }
+            }
+            connection.Close();
+            return p;
+        }
+
+        public void SavePhotographer(Photographer p)
+        {
+            string query = "INSERT INTO Photographer (Id, FirstName, LastName, Birthday) " + "VALUES (NEWID(), @firstname, @lastname, @birthday); ";
+            connection.Open();
+
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@firstname", p.FirstName);
+            cmd.Parameters.AddWithValue("@lastname", p.LastName);
+            if(p.Birthday != null)
+            {
+                cmd.Parameters.AddWithValue("@birthday", p.Birthday);
+            }
+            else
+            {
+                cmd.Parameters.AddWithValue("@birthday", DBNull.Value);
+
+            }
+
+            cmd.ExecuteNonQuery();
+
+            connection.Close();
         }
     }
 }

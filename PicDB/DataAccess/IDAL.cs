@@ -11,5 +11,9 @@ namespace PicDB.DataAccess
         Picture getPictureById(Guid ID);
         void savePicture(Picture p);
         void deletePicture(Picture p);
+        IList<Photographer> GetAllPhotographers();
+        Photographer GetPhotographerById(Guid id);
+        void SavePhotographer(Photographer p);
+
     }
 }

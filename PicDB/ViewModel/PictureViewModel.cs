@@ -19,7 +19,13 @@ namespace PicDB.ViewModel
         {
             Images = new List<Picture>();
             ListBoxThumbnails = new DataGrid().Items;
+            InitExifData();
+            InitPictures();
+            //TestMethod();
+        }
 
+        private void TestMethod()
+        {
             IList<ExifProperty> testProps = new List<ExifProperty>();
             ExifProperty prop1 = new ExifProperty();
             prop1.Name = "testprop";
@@ -37,13 +43,23 @@ namespace PicDB.ViewModel
             p.Name = "TestName";
             p.Image = "TestImage";
             p.ExifProperties = testProps;
+
+            Photographer photographer1 = new Photographer();
+            photographer1.FirstName = "Max";
+            photographer1.LastName = "Mustermann";
+            photographer1.Birthday = DateTime.Now;
+            Photographer photographer2 = new Photographer();
+            photographer2.FirstName = "Erika";
+            photographer2.LastName = "Mustermann";
+
             DALDatabase dALDatabase = new DALDatabase();
             // dALDatabase.addPicture(p);
             //dALDatabase.getPictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
-            dALDatabase.getAllPictures();
-
-            InitExifData();
-            InitPictures();
+            //dALDatabase.getAllPictures();
+            //dALDatabase.SavePhotographer(photographer1);
+            //dALDatabase.SavePhotographer(photographer2);
+            //dALDatabase.GetAllPhotographers();
+            //dALDatabase.GetPhotographerById(new Guid("212839F0-ED3C-43B3-BE5E-446159D94DF1"));
         }
 
         private void InitPictures()
