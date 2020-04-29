@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PicDB.ViewModel;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +16,28 @@ namespace PicDB
     /// </summary>
     public partial class App : Application
     {
+        private ServiceProvider _serviceProvider;
+
+        public App()
+        {
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            _serviceProvider = serviceCollection.BuildServiceProvider();
+        }
+
+        private void ConfigureServices(ServiceCollection services)
+        {
+            services.AddScoped<MainWindow>();
+            services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<PictureViewModel>();
+        }
+
+        private void App_OnStartup(object sender, StartupEventArgs e)
+        {
+            var mainWindow = _serviceProvider.GetService<MainWindow>();
+            mainWindow.Show();
+        }
     }
 }
+

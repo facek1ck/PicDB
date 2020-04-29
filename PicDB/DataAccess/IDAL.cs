@@ -15,6 +15,8 @@ namespace PicDB.DataAccess
         Photographer GetPhotographerById(Guid id);
         void SavePhotographer(Photographer p);
         void DeletePhotographerById(Guid ID);
+        void UpdatePhotographer(Photographer p);
+        void UpdatePicture(Picture p);
 
     }
 }

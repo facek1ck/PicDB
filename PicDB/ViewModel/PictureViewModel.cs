@@ -10,10 +10,11 @@ using System.Windows.Controls;
 using System.IO;
 using System.Windows.Media.Imaging;
 using PicDB.DataAccess;
+using Serilog;
 
 namespace PicDB.ViewModel
 {
-    class PictureViewModel : INotifyPropertyChanged
+    public class PictureViewModel : INotifyPropertyChanged
     {
         public PictureViewModel()
         {
@@ -21,7 +22,7 @@ namespace PicDB.ViewModel
             ListBoxThumbnails = new DataGrid().Items;
             InitExifData();
             InitPictures();
-            TestMethod();
+            //TestMethod();
         }
 
         private void TestMethod()
@@ -61,11 +62,12 @@ namespace PicDB.ViewModel
             //dALDatabase.GetAllPhotographers();
             //dALDatabase.GetPhotographerById(new Guid("212839F0-ED3C-43B3-BE5E-446159D94DF1"));
             //dALDatabase.DeletePhotographerById(new Guid("60E3680B-B92A-478A-874F-F4F2E5228E5A"));
-            dALDatabase.DeletePictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
+            //dALDatabase.DeletePictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
         }
 
         private void InitPictures()
         {
+            Log.Information("[Picture Data] - Picture Data Initialization...");
             string filepath = "C:/Users/gashe/Pictures/temp/";
             DirectoryInfo directoryInfo = new DirectoryInfo(filepath);
 
@@ -102,6 +104,7 @@ namespace PicDB.ViewModel
 
         private void InitExifData()
         {
+            Log.Information("[EXIF Data] - EXIF Data Initialization...");
             ExifProperties = new List<ExifProperty>();
             foreach (ExifTags t in Enum.GetValues(typeof(ExifTags)))
             {
@@ -158,6 +161,10 @@ namespace PicDB.ViewModel
             {
                 _currentValue = value;
                 ((ExifProperty)ExifProps.CurrentItem).Value = _currentValue;
+                if (!((ExifProperty)ExifProps.CurrentItem).Changed)
+                {
+                    ((ExifProperty)ExifProps.CurrentItem).Changed = true;
+                }
                 OnPropertyChanged("CurrentValue");
             }
         }
@@ -171,6 +178,10 @@ namespace PicDB.ViewModel
             {
                 _currentComment = value;
                 ((ExifProperty)ExifProps.CurrentItem).Comment = value;
+                if (!((ExifProperty)ExifProps.CurrentItem).Changed)
+                {
+                    ((ExifProperty)ExifProps.CurrentItem).Changed = true;
+                }
                 OnPropertyChanged("CurrentComment");
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 
 using PicDB.ViewModel;
+using Serilog;
 
 namespace PicDB
 {
@@ -9,11 +10,11 @@ namespace PicDB
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        private PictureViewModel pictureViewModel = new PictureViewModel();
-        public MainWindow()
+        public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
-            DataContext = pictureViewModel;
+            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+            Log.Information("Starting Application...");
+            DataContext = mainWindowViewModel;
             InitializeComponent();
             
         }

@@ -269,5 +269,50 @@ namespace PicDB.DataAccess
             cmd.ExecuteNonQuery();
             connection.Close();
         }
+
+        public void UpdatePhotographer(Photographer p)
+        {
+            string query = "update Photographer set FirstName = @firstname, LastName = @lastname, Birtday = @birthday where Id = @id";
+            connection.Open();
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@firstname",p.FirstName);
+            cmd.Parameters.AddWithValue("@lastname",p.LastName);
+            if (p.Birthday != null)
+            {
+                cmd.Parameters.AddWithValue("@birthday", p.Birthday);
+            }
+            else
+            {
+                cmd.Parameters.AddWithValue("@birthday", DBNull.Value);
+
+            }
+            cmd.Parameters.AddWithValue("id",p.ID);
+            cmd.ExecuteNonQuery();
+            connection.Open();
+        }
+
+        public void UpdatePicture(Picture p)
+        {
+            connection.Open();
+            UpdateExifTagsForPicture(p);
+            connection.Close();
+        }
+
+        private void UpdateExifTagsForPicture(Picture p)
+        {
+            string query = "update ExifData set Value= @value, Comment = @comment where Id = @id";
+            foreach (ExifProperty prop in p.ExifProperties)
+            {
+                if (prop.Changed)
+                {
+                    SqlCommand cmd = getCommand(query);
+                    cmd.Parameters.AddWithValue("@value", prop.Value);
+                    cmd.Parameters.AddWithValue("@comment", prop.Comment);
+                    cmd.Parameters.AddWithValue("@id", prop.ID);
+                    cmd.ExecuteNonQuery();
+                    prop.Changed = false;
+                }
+            }
+        }
     }
 }

@@ -4,7 +4,14 @@ using System.Text;
 
 namespace PicDB.ViewModel
 {
-    class MainWindowViewModel
+    public class MainWindowViewModel
     {
+        PictureViewModel _pictureViewModel;
+        public MainWindowViewModel(PictureViewModel pictureViewModel)
+        {
+            _pictureViewModel = pictureViewModel;
+        }
+
+        public PictureViewModel PictureViewModel { get { return _pictureViewModel; } }
     }
 }

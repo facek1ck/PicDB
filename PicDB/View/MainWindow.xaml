@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PicDB"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
+    <DockPanel DataContext="{Binding PictureViewModel}">
         <Menu DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1,1,1,1">
             <Menu.ItemsPanel>
                 <ItemsPanelTemplate>

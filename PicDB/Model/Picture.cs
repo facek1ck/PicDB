@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace PicDB.Model
 {
-    class Picture
+    public class Picture
     {
         public Guid ID { get; set; }
 
