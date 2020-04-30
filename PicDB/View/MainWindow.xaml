@@ -13,8 +13,8 @@
                     <DockPanel HorizontalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
-            <MenuItem Header="_File" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65" >
-                <MenuItem Header="_New" />
+            <MenuItem Header="_File" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65">
+                <MenuItem Header="_New" Click="MenuItemNew_Click"/>
                 <MenuItem Header="_Open" />
                 <MenuItem Header="_Save" />
                 <Separator />

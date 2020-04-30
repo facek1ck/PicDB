@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 
 namespace PicDB.DataAccess
 {
-    class DALDatabase : IDAL
+    public class DALDatabase : IDAL
     {
         
         private static readonly SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\gashe\\work\\sem4\\swe2\\PicDB\\PicDB\\Database.mdf;Integrated Security=True;MultipleActiveResultSets=true");

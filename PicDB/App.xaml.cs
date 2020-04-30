@@ -28,9 +28,10 @@ namespace PicDB
 
         private void ConfigureServices(ServiceCollection services)
         {
-            services.AddScoped<MainWindow>();
-            services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<DataAccess.DALDatabase>();
             services.AddScoped<PictureViewModel>();
+            services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<MainWindow>();
         }
 
         private void App_OnStartup(object sender, StartupEventArgs e)

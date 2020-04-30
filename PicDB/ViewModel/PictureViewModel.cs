@@ -11,18 +11,25 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using PicDB.DataAccess;
 using Serilog;
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
+using Microsoft.Win32;
+using System.Drawing;
+using Image = System.Windows.Controls.Image;
 
 namespace PicDB.ViewModel
 {
     public class PictureViewModel : INotifyPropertyChanged
     {
-        public PictureViewModel()
+        DALDatabase database;
+        public PictureViewModel(DALDatabase database)
         {
             Images = new List<Picture>();
             ListBoxThumbnails = new DataGrid().Items;
             InitExifData();
             InitPictures();
             //TestMethod();
+            this.database = database;
         }
 
         private void TestMethod()
@@ -53,7 +60,6 @@ namespace PicDB.ViewModel
             photographer2.FirstName = "Erika";
             photographer2.LastName = "Mustermann";
 
-            DALDatabase dALDatabase = new DALDatabase();
             // dALDatabase.addPicture(p);
             //dALDatabase.getPictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
             //dALDatabase.getAllPictures();
@@ -128,20 +134,7 @@ namespace PicDB.ViewModel
             } }
 
         public string _selectedImagePath = "";
-        public string SelectedImagePath
-        {get;set;
-            //get
-            //{
-            //    return _selectedImagePath;
-            //}
-            //set
-            //{
-            //    _selectedImagePath = value;
-            //    ((Picture)ImageProps.CurrentItem).Path = _selectedImagePath;
-            //    OnPropertyChanged("SelectedImagePath");
-            //    OnPropertyChanged("SelectedImageSource");
-            //}
-        }
+        public string SelectedImagePath{get; set;}
         public CollectionView ImageProps { get; private set; }
 
         public ItemCollection ListBoxThumbnails { get; set; }
@@ -209,7 +202,58 @@ namespace PicDB.ViewModel
             
         }
 
+        public void AddNewPicture()
+        {
+            Picture p = new Picture();
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Image Files(*.JPG)|*.JPG;";
+            dialog.CheckFileExists = true;
+            dialog.Multiselect = false;
+            if (dialog.ShowDialog() == true)
+            {
+                Bitmap image = new Bitmap(dialog.FileName);
+                p.Path = dialog.FileName;
+                p.Name = dialog.FileName.Substring(dialog.FileName.LastIndexOf('\\') + 1);
+                byte[] imageArray = File.ReadAllBytes(dialog.FileName);
+                p.Image = Convert.ToBase64String(imageArray);
+            }
+            p.ExifProperties = GetExifPropsForNewPicture(p);
 
+            database.SavePicture(p);
+        }
 
+        private IList<ExifProperty> GetExifPropsForNewPicture(Picture p)
+        {
+            IList<ExifProperty> props = new List<ExifProperty>();
+            var directories = ImageMetadataReader.ReadMetadata(p.Path);
+
+            foreach (var directory in directories)
+            {
+                if (directory
+                    .Is<ExifIfd0Directory>()
+                    .Or<ExifImageDirectory>()
+                    .Or<ExifInteropDirectory>()
+                    .Or<ExifSubIfdDirectory>()
+                    .Or<ExifThumbnailDirectory>())
+                {
+                    foreach (var tag in directory.Tags)
+                    {
+                        ExifProperty prop = new ExifProperty();
+                        prop.Name = tag.Name;
+                        prop.TagNumber = tag.Type;
+                        prop.Value = tag.Description;
+                        props.Add(prop);
+
+                    }
+
+                    if (directory.HasError)
+                    {
+                        foreach (var error in directory.Errors)
+                            Console.WriteLine($"ERROR: {error}");
+                    }
+                }
+            }
+            return props;
+        }
     }
 }

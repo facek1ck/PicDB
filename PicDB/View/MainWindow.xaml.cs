@@ -10,15 +10,18 @@ namespace PicDB
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainWindowViewModel _mainWindowViewModel;
         public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
-            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
             Log.Information("Starting Application...");
             DataContext = mainWindowViewModel;
-            InitializeComponent();
-            
+            _mainWindowViewModel = mainWindowViewModel;
+            InitializeComponent(); 
         }
 
-
+        private void MenuItemNew_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindowViewModel.PictureViewModel.AddNewPicture();
+        }
     }
 }

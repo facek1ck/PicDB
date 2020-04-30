@@ -1,6 +1,14 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using Microsoft.Win32;
+using PicDB.Model;
+using System.Drawing;
+using MetadataExtractor;
+using System.Linq;
+using MetadataExtractor.Formats.Exif;
 
 namespace PicDB.ViewModel
 {
@@ -9,6 +17,8 @@ namespace PicDB.ViewModel
         PictureViewModel _pictureViewModel;
         public MainWindowViewModel(PictureViewModel pictureViewModel)
         {
+            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+            Log.Information("MWVM");
             _pictureViewModel = pictureViewModel;
         }
 
