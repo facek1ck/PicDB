@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PicDB.DataAccess;
 using PicDB.ViewModel;
 using Serilog;
 using System;
@@ -28,7 +29,7 @@ namespace PicDB
 
         private void ConfigureServices(ServiceCollection services)
         {
-            services.AddScoped<DataAccess.DALDatabase>();
+            services.AddScoped<DALDatabase>();
             services.AddScoped<PictureViewModel>();
             services.AddScoped<MainWindowViewModel>();
             services.AddScoped<MainWindow>();

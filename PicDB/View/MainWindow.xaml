@@ -14,8 +14,8 @@
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
             <MenuItem Header="_File" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65">
-                <MenuItem Header="_New" Click="MenuItemNew_Click"/>
-                <MenuItem Header="_Open" />
+                <MenuItem Header="Add Image" Click="MenuItemNew_Click"/>
+                <MenuItem Header="Delete Selected" Click="MenuItemDelete_Click" />
                 <MenuItem Header="_Save" />
                 <Separator />
                 <MenuItem Header="_Exit" />
@@ -66,10 +66,10 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24" ItemsSource="{Binding ExifProps}" IsSynchronizedWithCurrentItem="True" DisplayMemberPath="Name"/>
-                            <TextBox Text="{Binding CurrentValue, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
-                            <TextBox Text="{Binding CurrentComment, Mode=TwoWay}" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Height="Auto" Width="Auto" VerticalContentAlignment="Center"/>
-                            <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14"/>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24" ItemsSource="{Binding Path=ExifProps, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding Path=SelectedExifProp}" DisplayMemberPath="Name"/>
+                            <TextBox Text="{Binding CurrentValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
+                            <TextBox Text="{Binding CurrentComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Height="Auto" Width="Auto" VerticalContentAlignment="Center"/>
+                            <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14" IsEnabled="{Binding Changed}" Click="Save_Click"/>
                         </Grid>
                     </TabItem>
                     <TabItem Header="IPTC">
@@ -100,12 +100,17 @@
                     </ControlTemplate>
                 </GridSplitter.Template>
             </GridSplitter>
-            <ListBox Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding ImageProps}" IsSynchronizedWithCurrentItem="True">
+            <ListBox x:Name="ThumbnailListBox" SelectionMode="Single" Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding Path=ListBoxThumbnails}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding Path=SelectedThumbnail}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Image}" Stretch="Uniform"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Rows="1" Columns="{Binding ThumbnailCount, Mode=TwoWay}"/>

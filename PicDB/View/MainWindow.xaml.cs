@@ -23,5 +23,15 @@ namespace PicDB
         {
             _mainWindowViewModel.PictureViewModel.AddNewPicture();
         }
+
+        private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindowViewModel.PictureViewModel.DeleteCurrentPicture();
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindowViewModel.PictureViewModel.SavePropertiesForPicture();
+        }
     }
 }

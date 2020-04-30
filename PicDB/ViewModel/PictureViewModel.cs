@@ -16,136 +16,144 @@ using MetadataExtractor.Formats.Exif;
 using Microsoft.Win32;
 using System.Drawing;
 using Image = System.Windows.Controls.Image;
+using System.Windows;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PicDB.ViewModel
 {
     public class PictureViewModel : INotifyPropertyChanged
     {
+        private ObservableCollection<ViewImage> _listBoxThumbnails =  new ObservableCollection<ViewImage>();
         DALDatabase database;
         public PictureViewModel(DALDatabase database)
         {
-            Images = new List<Picture>();
-            ListBoxThumbnails = new DataGrid().Items;
-            InitExifData();
-            InitPictures();
-            //TestMethod();
             this.database = database;
-        }
-
-        private void TestMethod()
-        {
-            IList<ExifProperty> testProps = new List<ExifProperty>();
-            ExifProperty prop1 = new ExifProperty();
-            prop1.Name = "testprop";
-            prop1.TagNumber = 1234;
-            prop1.Value = "testval";
-            prop1.Comment = "";
-            ExifProperty prop2 = new ExifProperty();
-            prop2.Name = "testprop2";
-            prop2.TagNumber = 4321;
-            prop2.Value = "";
-            prop2.Comment = "testComment";
-            testProps.Add(prop1);
-            testProps.Add(prop2);
-            Picture p = new Picture();
-            p.Name = "TestName";
-            p.Image = "TestImage";
-            p.ExifProperties = testProps;
-
-            Photographer photographer1 = new Photographer();
-            photographer1.FirstName = "Max";
-            photographer1.LastName = "Mustermann";
-            photographer1.Birthday = DateTime.Now;
-            Photographer photographer2 = new Photographer();
-            photographer2.FirstName = "Erika";
-            photographer2.LastName = "Mustermann";
-
-            // dALDatabase.addPicture(p);
-            //dALDatabase.getPictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
-            //dALDatabase.getAllPictures();
-            //dALDatabase.SavePhotographer(photographer1);
-            //dALDatabase.SavePhotographer(photographer2);
-            //dALDatabase.GetAllPhotographers();
-            //dALDatabase.GetPhotographerById(new Guid("212839F0-ED3C-43B3-BE5E-446159D94DF1"));
-            //dALDatabase.DeletePhotographerById(new Guid("60E3680B-B92A-478A-874F-F4F2E5228E5A"));
-            //dALDatabase.DeletePictureById(new Guid("09F37028-CA20-4D69-89FD-0C9BCC3A7A88"));
+            Images = new List<Picture>();
+            InitPictures();
         }
 
         private void InitPictures()
         {
             Log.Information("[Picture Data] - Picture Data Initialization...");
-            string filepath = "C:/Users/gashe/Pictures/temp/";
-            DirectoryInfo directoryInfo = new DirectoryInfo(filepath);
+            //string filepath = "C:/Users/gashe/Pictures/temp/";
+            //DirectoryInfo directoryInfo = new DirectoryInfo(filepath);
 
-            FillImagesList(directoryInfo);
+            FillImagesList(/*directoryInfo*/);
+            CreateThumbnails();
 
+            if (ListBoxThumbnails.Count() > 0)
+            {
+                SelectedThumbnail = (ViewImage)ListBoxThumbnails[0];
+                SelectedImageSource = FromBase64(Images[0].Image);
+            }
+        }
+
+        private void CreateThumbnails()
+        {
+            ObservableCollection<ViewImage> tmp = new ObservableCollection<ViewImage>();
             ThumbnailCount = Images.Count;
-            for(int i=0; i< ThumbnailCount; i++)
+            for (int i = 0; i < ThumbnailCount; i++)
             {
-                Image image = new Image() { Source = new BitmapImage(new Uri(Images[i].Path, UriKind.Absolute)), Stretch = Stretch.Uniform };
-                ListBoxThumbnails.Add(image);
+                ViewImage viewImage = CreateViewImage(Images[i]);
+                tmp.Add(viewImage);
             }
-
-            ImageProps = new CollectionView(ListBoxThumbnails);
-            ImageProps.MoveCurrentTo(ListBoxThumbnails[0]);
-            ImageProps.CurrentChanged += new EventHandler(imageProps_CurrentChanged);
-
-            SelectedImagePath = Images[0].Path;
-            SelectedImageSource = new BitmapImage(new Uri(SelectedImagePath, UriKind.Absolute));
+            ListBoxThumbnails = tmp;
         }
 
-        private void FillImagesList(DirectoryInfo directoryInfo)
+        private ViewImage CreateViewImage(Picture p)
         {
-            int k = 0;
-            foreach(var file in directoryInfo.GetFiles("*.jpg"))
-            {
-                Picture picture = new Picture();
-                //picture.ID = k;
-                picture.Name = file.Name;
-                picture.Path = directoryInfo.FullName + file.Name;
-                k++;
-                Images.Add(picture);
-            }
+            Image image = new Image() { Source = FromBase64(p.Image), Stretch = Stretch.Uniform };
+            ViewImage viewImage = new ViewImage();
+            viewImage.Picture = p;
+            viewImage.Image = image.Source;
+            return viewImage;
         }
 
-        private void InitExifData()
+        private BitmapImage FromBase64(string base64)
         {
-            Log.Information("[EXIF Data] - EXIF Data Initialization...");
-            ExifProperties = new List<ExifProperty>();
-            foreach (ExifTags t in Enum.GetValues(typeof(ExifTags)))
+            using (var stream = new MemoryStream(Convert.FromBase64String(base64)))
             {
-                ExifProperty exifProperty = new ExifProperty();
-                exifProperty.TagNumber = (int)t;
-                exifProperty.Name = t.ToString();
-                ExifProperties.Add(exifProperty);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = stream;
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
             }
-            ExifProps = new CollectionView(ExifProperties);
-            ExifProps.MoveCurrentTo(ExifProperties[0]);
-            ExifProps.CurrentChanged += new EventHandler(props_CurrentChanged);
         }
 
-        public List<Picture> Images;
+        private void FillImagesList()
+        {
+            Images = database.GetAllPictures();
+        }
+
+        public IList<Picture> Images;
 
         public ImageSource _selectedImageSource;
-        public ImageSource SelectedImageSource { get { return _selectedImageSource; } set
+        public ImageSource SelectedImageSource 
+        { 
+            get 
+            { 
+                return _selectedImageSource; 
+            } 
+            set
             {
                 _selectedImageSource = value;
                 OnPropertyChanged("SelectedImageSource");
-            } }
+            } 
+        }
 
-        public string _selectedImagePath = "";
-        public string SelectedImagePath{get; set;}
-        public CollectionView ImageProps { get; private set; }
+        public ViewImage _selectedThumbnail = new ViewImage();
+        public ViewImage SelectedThumbnail { 
+            get 
+            {
+                return _selectedThumbnail;
+            } 
+            set 
+            {
+                if (value != null)
+                {
+                    _selectedThumbnail = value;
+                    SelectedImageSource = _selectedThumbnail.Image;
+                    ExifProps = _selectedThumbnail.Picture.ExifProperties;
+                    Changed = _selectedThumbnail.Picture.Changed;
+                    OnPropertyChanged("SelectedImageSource");
+                    OnPropertyChanged("CurrentValue");
+                    OnPropertyChanged("CurrentComment");
+                    OnPropertyChanged("ExifProps");
+                    OnPropertyChanged("Changed");
+                }
+                else
+                {
+                    SelectedImageSource = null;
+                    SelectedExifProp = null;
+                    ExifProps = null;
+                    CurrentValue = "";
+                    CurrentComment = "";
+                    OnPropertyChanged("ExifProps");
+                }
 
-        public ItemCollection ListBoxThumbnails { get; set; }
+            }
+        }
+
+        public ObservableCollection<ViewImage> ListBoxThumbnails 
+        { 
+            get 
+            {
+                return _listBoxThumbnails; 
+            } 
+            set 
+            {
+                _listBoxThumbnails = value;
+            } 
+        }
 
         public int ThumbnailCount { get; set; }
 
-        public IList<ExifProperty> ExifProperties { get; set; }
-
-
-        private string _currentValue="", _currentComment="";
-        public string CurrentValue { 
+        private string _currentValue = "", _currentComment = "";
+        public string CurrentValue {
             get
             {
                 return _currentValue;
@@ -153,12 +161,22 @@ namespace PicDB.ViewModel
             set
             {
                 _currentValue = value;
-                ((ExifProperty)ExifProps.CurrentItem).Value = _currentValue;
-                if (!((ExifProperty)ExifProps.CurrentItem).Changed)
+                foreach(ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
                 {
-                    ((ExifProperty)ExifProps.CurrentItem).Changed = true;
+                    if (prop.ID == _selectedExifProp.ID)
+                    {
+                        prop.Value = _currentValue;
+                        if (!prop.Changed)
+                        {
+                            prop.Changed = true;
+                        }
+                    }
                 }
+                _selectedThumbnail.Picture.Changed = true;
+                Changed = true;
                 OnPropertyChanged("CurrentValue");
+                OnPropertyChanged("Changed");
+
             }
         }
 
@@ -170,16 +188,44 @@ namespace PicDB.ViewModel
             set
             {
                 _currentComment = value;
-                ((ExifProperty)ExifProps.CurrentItem).Comment = value;
-                if (!((ExifProperty)ExifProps.CurrentItem).Changed)
+                foreach (ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
                 {
-                    ((ExifProperty)ExifProps.CurrentItem).Changed = true;
+                    if (prop.ID == _selectedExifProp.ID)
+                    {
+                        prop.Comment = _currentComment;
+                        if (!prop.Changed)
+                        {
+                            prop.Changed = true;
+                        }
+                    }
                 }
+                _selectedThumbnail.Picture.Changed = true;
+                Changed = true;
                 OnPropertyChanged("CurrentComment");
+                OnPropertyChanged("Changed");
             }
         }
 
-        public CollectionView ExifProps { get; private set; }
+        public IList<ExifProperty> ExifProps { get; set; }
+
+        private ExifProperty _selectedExifProp = new ExifProperty();
+        public ExifProperty SelectedExifProp {
+            get 
+            { 
+                return _selectedExifProp; 
+            }
+            set 
+            {
+                if(value != null)
+                {
+                _selectedExifProp = value;
+                _currentValue = SelectedExifProp.Value;
+                _currentComment = SelectedExifProp.Comment;
+                OnPropertyChanged("CurrentValue");
+                OnPropertyChanged("CurrentComment");
+                }
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -189,19 +235,6 @@ namespace PicDB.ViewModel
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
 
-        void props_CurrentChanged(object sender, EventArgs e)
-        {
-            CurrentValue = ((ExifProperty)ExifProps.CurrentItem).Value;
-            CurrentComment = ((ExifProperty)ExifProps.CurrentItem).Comment;
-        }
-        
-        void imageProps_CurrentChanged(object sender, EventArgs e)
-        {
-            SelectedImagePath = (((Image)ImageProps.CurrentItem).Source as BitmapImage).UriSource.OriginalString;
-            SelectedImageSource = new BitmapImage(new Uri(SelectedImagePath, UriKind.Absolute));
-            
-        }
-
         public void AddNewPicture()
         {
             Picture p = new Picture();
@@ -209,17 +242,26 @@ namespace PicDB.ViewModel
             dialog.Filter = "Image Files(*.JPG)|*.JPG;";
             dialog.CheckFileExists = true;
             dialog.Multiselect = false;
-            if (dialog.ShowDialog() == true)
+            var result = dialog.ShowDialog();
+            if (result == false)
             {
+                return;
+            }
                 Bitmap image = new Bitmap(dialog.FileName);
                 p.Path = dialog.FileName;
                 p.Name = dialog.FileName.Substring(dialog.FileName.LastIndexOf('\\') + 1);
                 byte[] imageArray = File.ReadAllBytes(dialog.FileName);
                 p.Image = Convert.ToBase64String(imageArray);
-            }
-            p.ExifProperties = GetExifPropsForNewPicture(p);
+                p.ExifProperties = GetExifPropsForNewPicture(p);
+            
+                database.SavePicture(p);
+                Images.Add(p);
+                CreateThumbnails();
+                OnPropertyChanged("ThumbnailCount");
+                OnPropertyChanged("ListBoxThumbnails");
+            
+            
 
-            database.SavePicture(p);
         }
 
         private IList<ExifProperty> GetExifPropsForNewPicture(Picture p)
@@ -243,7 +285,6 @@ namespace PicDB.ViewModel
                         prop.TagNumber = tag.Type;
                         prop.Value = tag.Description;
                         props.Add(prop);
-
                     }
 
                     if (directory.HasError)
@@ -253,7 +294,32 @@ namespace PicDB.ViewModel
                     }
                 }
             }
+            props.OrderBy(x => x.Name);
             return props;
         }
+
+        public void SavePropertiesForPicture()
+        {
+            Picture p = SelectedThumbnail.Picture;
+            database.UpdatePicture(p);
+            SelectedThumbnail.Picture.Changed = false;
+            Changed = false;
+            OnPropertyChanged("Changed");
+        }
+
+        public void DeleteCurrentPicture()
+        {
+            Picture p = SelectedThumbnail.Picture;
+            if(p != null)
+            {
+                database.DeletePictureById(p.ID);
+            }
+            Images.Remove(p);
+            CreateThumbnails();
+            OnPropertyChanged("ThumbnailCount");
+            OnPropertyChanged("ListBoxThumbnails");
+        }
+
+        public bool Changed { get; set; }
     }
 }

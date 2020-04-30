@@ -16,6 +16,8 @@ namespace PicDB.Model
         public IList<ExifProperty> ExifProperties { get; set; }
         public string Path { get; set; }
 
+        public bool Changed { get; set; }
+
         public string Image { get; set; } = "";
 
         public Photographer Photographer { get; set; }
