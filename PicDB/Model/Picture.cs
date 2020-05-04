@@ -13,7 +13,8 @@ namespace PicDB.Model
 
         public string Name { get; set; } = "";
 
-        public IList<ExifProperty> ExifProperties { get; set; }
+        public IList<Property> ExifProperties { get; set; }
+        public IList<Property> IptcProperties { get; set; }
         public string Path { get; set; }
 
         public bool Changed { get; set; }

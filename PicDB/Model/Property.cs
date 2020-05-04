@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PicDB.Model
 {
-    public class ExifProperty
+    public class Property
     {
         public Guid ID { get; set; }
         public int TagNumber { get; set; }

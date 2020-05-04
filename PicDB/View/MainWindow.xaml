@@ -57,7 +57,7 @@
                         </ControlTemplate>
                     </GridSplitter.Template>
                 </GridSplitter>
-                <TabControl x:Name="tabControl" Grid.Column="2">
+                <TabControl x:Name="tabControl" Grid.Column="2" SelectedIndex="{Binding SelectedTab}">
                     <TabItem Header="EXIF">
                         <Grid Background="White" Height="Auto" Width="Auto">
                             <Grid.RowDefinitions>
@@ -66,7 +66,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24" ItemsSource="{Binding Path=ExifProps, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding Path=SelectedExifProp}" DisplayMemberPath="Name"/>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24" ItemsSource="{Binding Path=Props, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding Path=SelectedProp}" DisplayMemberPath="Name"/>
                             <TextBox Text="{Binding CurrentValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
                             <TextBox Text="{Binding CurrentComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Height="Auto" Width="Auto" VerticalContentAlignment="Center"/>
                             <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14" IsEnabled="{Binding Changed}" Click="Save_Click"/>
@@ -80,10 +80,10 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24"/>
-                            <TextBox Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
-                            <TextBox Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Height="Auto" Width="Auto" VerticalContentAlignment="Center"/>
-                            <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14"/>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,5,5,0"  VerticalAlignment="Center" Width="Auto" Height="24" ItemsSource="{Binding Path=Props, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding Path=SelectedProp}" DisplayMemberPath="Name"/>
+                            <TextBox Text="{Binding CurrentValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
+                            <TextBox Text="{Binding CurrentComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Height="Auto" Width="Auto" VerticalContentAlignment="Center"/>
+                            <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14" IsEnabled="{Binding Changed}" Click="Save_Click"/>
                         </Grid>
                     </TabItem>
                 </TabControl>
