@@ -160,23 +160,27 @@ namespace PicDB.ViewModel
             }
             set
             {
-                _currentValue = value;
-                foreach(ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
+                if (_selectedThumbnail.Picture != null)
                 {
-                    if (prop.ID == _selectedExifProp.ID)
+
+
+                    _currentValue = value;
+                    foreach (ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
                     {
-                        prop.Value = _currentValue;
-                        if (!prop.Changed)
+                        if (prop.ID == _selectedExifProp.ID)
                         {
-                            prop.Changed = true;
+                            prop.Value = _currentValue;
+                            if (!prop.Changed)
+                            {
+                                prop.Changed = true;
+                            }
                         }
                     }
+                    _selectedThumbnail.Picture.Changed = true;
+                    Changed = true;
+                    OnPropertyChanged("CurrentValue");
+                    OnPropertyChanged("Changed");
                 }
-                _selectedThumbnail.Picture.Changed = true;
-                Changed = true;
-                OnPropertyChanged("CurrentValue");
-                OnPropertyChanged("Changed");
-
             }
         }
 
@@ -187,22 +191,25 @@ namespace PicDB.ViewModel
             }
             set
             {
-                _currentComment = value;
-                foreach (ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
+                if (_selectedThumbnail.Picture != null)
                 {
-                    if (prop.ID == _selectedExifProp.ID)
+                    _currentComment = value;
+                    foreach (ExifProperty prop in _selectedThumbnail.Picture.ExifProperties)
                     {
-                        prop.Comment = _currentComment;
-                        if (!prop.Changed)
+                        if (prop.ID == _selectedExifProp.ID)
                         {
-                            prop.Changed = true;
+                            prop.Comment = _currentComment;
+                            if (!prop.Changed)
+                            {
+                                prop.Changed = true;
+                            }
                         }
                     }
+                    _selectedThumbnail.Picture.Changed = true;
+                    Changed = true;
+                    OnPropertyChanged("CurrentComment");
+                    OnPropertyChanged("Changed");
                 }
-                _selectedThumbnail.Picture.Changed = true;
-                Changed = true;
-                OnPropertyChanged("CurrentComment");
-                OnPropertyChanged("Changed");
             }
         }
 
