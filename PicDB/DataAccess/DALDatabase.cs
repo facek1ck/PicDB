@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace PicDB.DataAccess
 {
     public class DALDatabase : IDAL
     {
-        
-        private static readonly SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\gashe\\work\\sem4\\swe2\\PicDB\\PicDB\\Database.mdf;Integrated Security=True;MultipleActiveResultSets=true");
+        private static readonly string connectionString = ConfigurationManager.AppSettings["database:connectionString"];
+        private static readonly SqlConnection connection = new SqlConnection(connectionString);
 
         public void SavePicture(Picture p)
         {
