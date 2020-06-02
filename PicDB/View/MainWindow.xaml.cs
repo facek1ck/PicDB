@@ -13,7 +13,6 @@ namespace PicDB
         MainWindowViewModel _mainWindowViewModel;
         public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
-            Log.Information("Starting Application...");
             DataContext = mainWindowViewModel;
             _mainWindowViewModel = mainWindowViewModel;
             InitializeComponent(); 
@@ -27,6 +26,11 @@ namespace PicDB
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
         {
             _mainWindowViewModel.PictureViewModel.DeleteCurrentPicture();
+        }
+
+        private void MenuItemShowPhotographers_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)

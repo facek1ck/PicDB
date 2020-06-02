@@ -17,8 +17,6 @@ namespace PicDB.ViewModel
         PictureViewModel _pictureViewModel;
         public MainWindowViewModel(PictureViewModel pictureViewModel)
         {
-            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
-            Log.Information("MWVM");
             _pictureViewModel = pictureViewModel;
         }
 

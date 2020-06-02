@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
 using System.Configuration;
+using Serilog;
 
 namespace PicDB.DataAccess
 {
@@ -99,7 +100,11 @@ namespace PicDB.DataAccess
 
         public void DeletePictureById(Guid ID)
         {
-            if (ID == Guid.Empty) { return; }
+            if (ID == Guid.Empty) 
+            {
+                Log.Debug("Nothing to delete... skipping");
+                return; 
+            }
             Picture p = new Picture();
             p.ID = ID;
             string query = "delete from Picture WHERE Id = " + "@id";
@@ -131,7 +136,11 @@ namespace PicDB.DataAccess
 
         private void deletePropertiesForPicture(IList<Guid> Ids)
         {
-            if(Ids.Count == 0) { return; }
+            if(Ids.Count == 0) 
+            {
+                Log.Debug("No properties for picture to delete... skipping");
+                return;
+            }
             string query = "delete from PropertyData WHERE Id in ({@id})";
             SqlCommand cmd = getCommand(query);
             cmd.AddArrayParameters("@id", Ids);
@@ -181,10 +190,6 @@ namespace PicDB.DataAccess
 
             using (var matcherReader = matcherCmd.ExecuteReader())
             {
-                if(matcherReader == null)
-                {
-                    Console.WriteLine("lol");
-                }
                 while (matcherReader.Read())
                 {
                     propIds.Add(matcherReader.GetGuid(0));

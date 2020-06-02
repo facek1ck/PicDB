@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using PicDB.DataAccess;
 using PicDB.Model;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +14,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +31,8 @@ namespace PicDB.ViewModel
         DALDatabase database;
         public PictureViewModel(DALDatabase database)
         {
+            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+            Log.Information("Starting Application...");
             this.database = database;
             Images = new List<Picture>();
             InitPictures();
@@ -39,22 +43,25 @@ namespace PicDB.ViewModel
             Log.Information("[Picture Data] - Picture Data Initialization...");
 
             FillImagesList();
-            CreateThumbnails();
+            CreateThumbnails(Images);
+            Log.Information("[Picture Data] - Initialization complete...");
 
             if (ListBoxThumbnails.Count() > 0)
             {
                 SelectedThumbnail = (ViewImage)ListBoxThumbnails[0];
                 SelectedImageSource = FromBase64(Images[0].Image);
             }
+            
+
         }
 
-        private void CreateThumbnails()
+        private void CreateThumbnails(IList<Picture> pictures)
         {
             ObservableCollection<ViewImage> tmp = new ObservableCollection<ViewImage>();
-            ThumbnailCount = Images.Count;
+            ThumbnailCount = pictures.Count;
             for (int i = 0; i < ThumbnailCount; i++)
             {
-                ViewImage viewImage = CreateViewImage(Images[i]);
+                ViewImage viewImage = CreateViewImage(pictures[i]);
                 tmp.Add(viewImage);
             }
             ListBoxThumbnails = tmp;
@@ -85,6 +92,7 @@ namespace PicDB.ViewModel
 
         private void FillImagesList()
         {
+            Log.Information("[Picture Data] - Fetching Data from DB...");
             Images = database.GetAllPictures();
         }
 
@@ -284,7 +292,7 @@ namespace PicDB.ViewModel
 
             database.SavePicture(p);
             Images.Add(p);
-            CreateThumbnails();
+            CreateThumbnails(Images);
             OnPropertyChanged("ThumbnailCount");
             OnPropertyChanged("ListBoxThumbnails");
 
@@ -372,7 +380,7 @@ namespace PicDB.ViewModel
                 database.DeletePictureById(p.ID);
             }
             Images.Remove(p);
-            CreateThumbnails();
+            CreateThumbnails(Images);
             OnPropertyChanged("ThumbnailCount");
             OnPropertyChanged("ListBoxThumbnails");
         }
@@ -413,6 +421,50 @@ namespace PicDB.ViewModel
                 OnPropertyChanged("CurrentComment");
                 OnPropertyChanged("Changed");
             }
+        }
+        private string _searchString = "";
+        public string SearchString
+        {
+            get
+            {
+                return _searchString;
+            }
+            set
+            {
+                _searchString = value;
+                if (!String.IsNullOrEmpty(_searchString))
+                {
+                    CreateThumbnails(FilterImages(_searchString));
+                    OnPropertyChanged("ThumbnailCount");
+                    OnPropertyChanged("ListBoxThumbnails");
+                }
+                else
+                {
+                    CreateThumbnails(Images);
+                    OnPropertyChanged("ThumbnailCount");
+                    OnPropertyChanged("ListBoxThumbnails");
+                }
+            }
+        }
+
+        private IList<Picture> FilterImages(string searchString)
+        {
+            searchString = searchString.ToUpper();
+            //return Images.Where(p => /*p.Photographer != null && (
+            //                        p.Photographer.FirstName.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
+            //                        p.Photographer.LastName.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||*/
+            //                        p.ExifProperties.All(tag => tag.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
+            //                                                    tag.Comment.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0
+            //                                            ) ||
+            //                        p.IptcProperties.All(tag => tag.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
+            //                                                    tag.Comment.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0
+            //                                            )
+            //                        ).ToList();
+
+
+            return Images.Where( i => i.ExifProperties.Any(z => z.Value.ToUpper().Contains(searchString))
+            ).ToList();
+
         }
     }
 }
