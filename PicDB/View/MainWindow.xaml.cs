@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-
+using PicDB.View;
 using PicDB.ViewModel;
 using Serilog;
 
@@ -11,10 +11,13 @@ namespace PicDB
     public partial class MainWindow : Window
     {
         MainWindowViewModel _mainWindowViewModel;
-        public MainWindow(MainWindowViewModel mainWindowViewModel)
+        PhotographerWindowViewModel _photographerWindowViewModel;
+
+        public MainWindow(MainWindowViewModel mainWindowViewModel, PhotographerWindowViewModel photographerWindowViewModel)
         {
             DataContext = mainWindowViewModel;
             _mainWindowViewModel = mainWindowViewModel;
+            _photographerWindowViewModel = photographerWindowViewModel;
             InitializeComponent(); 
         }
 
@@ -30,7 +33,8 @@ namespace PicDB
 
         private void MenuItemShowPhotographers_Click(object sender, RoutedEventArgs e)
         {
-            
+            var popup = new PhotographerWindow(_photographerWindowViewModel);
+            popup.ShowDialog();
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)

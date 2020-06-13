@@ -1,35 +1,32 @@
-﻿using PicDB.Model;
+﻿using PicDB.DataAccess;
+using PicDB.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace PicDB.ViewModel
 {
-    class PhotographerViewModel
+    public class PhotographerViewModel
     {
-        public PhotographerViewModel(Photographer photographer)
+        private ObservableCollection<Photographer> _photographers; 
+        public PhotographerViewModel(DALDatabase database)
         {
-            _photographer = photographer;
+            Photographers = new ObservableCollection<Photographer>(database.GetAllPhotographers());
         }
 
-        private Photographer _photographer { get; set; }
-        public Guid ID { get { return _photographer.ID; } }
-        public string FirstName { get { return _photographer.FirstName; } }
-        public string LastName { get { return _photographer.LastName; } }
-
-        public DateTime? Birthday { get { return _photographer.Birthday; } }
-
-        public bool ShowBirthday { get { return Birthday.HasValue; } }
+        public ObservableCollection<Photographer> Photographers { get { return _photographers; } set { _photographers = value; } }
 
 
         bool isValid
         {
             get
             {
-                return ID != null && !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName);
+                return false;
+               // return ID != null && !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName);
             }
         }
-        string ValidationSummary 
+         string ValidationSummary 
         { 
             get
             {

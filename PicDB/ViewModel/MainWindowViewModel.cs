@@ -21,5 +21,6 @@ namespace PicDB.ViewModel
         }
 
         public PictureViewModel PictureViewModel { get { return _pictureViewModel; } }
+        public bool ShowPhotographersPopup { get; set; } = false;
     }
 }
