@@ -324,7 +324,15 @@ namespace PicDB.DataAccess
             connection.Open();
 
             SqlCommand cmd = getCommand(query);
-            cmd.Parameters.AddWithValue("@firstname", p.FirstName);
+            if(p.FirstName != null)
+            {
+                cmd.Parameters.AddWithValue("@firstname", p.FirstName);
+            }
+            else
+            {
+                cmd.Parameters.AddWithValue("@firstname", DBNull.Value);
+            }
+            
             cmd.Parameters.AddWithValue("@lastname", p.LastName);
             if(p.Birthday != null)
             {
@@ -353,7 +361,7 @@ namespace PicDB.DataAccess
 
         public void UpdatePhotographer(Photographer p)
         {
-            string query = "update Photographer set FirstName = @firstname, LastName = @lastname, Birtday = @birthday where Id = @id";
+            string query = "update Photographer set FirstName = @firstname, LastName = @lastname, Birthday = @birthday where Id = @id";
             connection.Open();
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@firstname",p.FirstName);
@@ -369,7 +377,7 @@ namespace PicDB.DataAccess
             }
             cmd.Parameters.AddWithValue("id",p.ID);
             cmd.ExecuteNonQuery();
-            connection.Open();
+            connection.Close();
         }
 
         public void UpdatePicture(Picture p)

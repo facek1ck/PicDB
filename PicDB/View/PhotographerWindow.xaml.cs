@@ -23,7 +23,23 @@ namespace PicDB.View
         {
             _photographerWindowViewModel = photographerWindowViewModel;
             DataContext = photographerWindowViewModel;
+            _photographerWindowViewModel.PhotographerViewModel.clearCurrentPhotographer();
             InitializeComponent();
+        }
+
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new PhotographerAddWindow(_photographerWindowViewModel.PhotographerViewModel, true);
+            popup.ShowDialog();
+            _photographerWindowViewModel.PhotographerViewModel.clearCurrentPhotographer();
+            this.Close();
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            _photographerWindowViewModel.PhotographerViewModel.DeletePhotographer();
+            _photographerWindowViewModel.PhotographerViewModel.clearCurrentPhotographer();
+
         }
     }
 }

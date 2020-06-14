@@ -7,8 +7,14 @@
         mc:Ignorable="d"
         Title="PhotographerWindow" Height="200" Width="400">
     <Grid DataContext="{Binding PhotographerViewModel}">
-        <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Path=Photographers}"
+        <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Path=Photographers}" SelectedItem="{Binding CurrentPhotographer}"
                   >
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Edit" Click="Edit_Click"></MenuItem>
+                    <MenuItem Header="Delete" Click="Delete_Click"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
     </Grid>
 </Window>

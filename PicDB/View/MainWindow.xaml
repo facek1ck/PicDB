@@ -24,6 +24,7 @@
             </MenuItem>
             <MenuItem Header="_Photographer" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="100">
                 <MenuItem Header="List Photographers" Click="MenuItemShowPhotographers_Click"/>
+                <MenuItem Header="Add Photographer" Click="MenuItemAddPhotographer_Click"/>
             </MenuItem>
 
             <MenuItem Header="_Reports" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65">

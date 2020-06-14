@@ -12,12 +12,14 @@ namespace PicDB
     {
         MainWindowViewModel _mainWindowViewModel;
         PhotographerWindowViewModel _photographerWindowViewModel;
+        PhotographerViewModel _photographerViewModel;
 
-        public MainWindow(MainWindowViewModel mainWindowViewModel, PhotographerWindowViewModel photographerWindowViewModel)
+        public MainWindow(MainWindowViewModel mainWindowViewModel, PhotographerWindowViewModel photographerWindowViewModel, PhotographerViewModel photographerViewModel)
         {
             DataContext = mainWindowViewModel;
             _mainWindowViewModel = mainWindowViewModel;
             _photographerWindowViewModel = photographerWindowViewModel;
+            _photographerViewModel = photographerViewModel;
             InitializeComponent(); 
         }
 
@@ -34,6 +36,12 @@ namespace PicDB
         private void MenuItemShowPhotographers_Click(object sender, RoutedEventArgs e)
         {
             var popup = new PhotographerWindow(_photographerWindowViewModel);
+            popup.ShowDialog();
+        }
+        
+        private void MenuItemAddPhotographer_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new PhotographerAddWindow(_photographerViewModel, false);
             popup.ShowDialog();
         }
 
