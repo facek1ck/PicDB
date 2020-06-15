@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using PicDB.Helpers;
 using PicDB.View;
 using PicDB.ViewModel;
 using Serilog;
@@ -48,6 +50,32 @@ namespace PicDB
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _mainWindowViewModel.PictureViewModel.SavePropertiesForPicture();
+        }
+
+        private void MenuItemAssignPhotographer_Click(object sender, RoutedEventArgs e)
+        {
+            var popup = new AssignPhotographerWindow(_mainWindowViewModel, _photographerViewModel, _mainWindowViewModel.PictureViewModel.SelectedThumbnail.Picture);
+            popup.ShowDialog();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void MenuItemPictureReport_Click(object sender, RoutedEventArgs e)
+        {
+            Reporting.printPicture(_mainWindowViewModel.PictureViewModel.SelectedThumbnail.Picture);
+        }
+
+        private void MenuItemTagReport_Click(object sender, RoutedEventArgs e)
+        {
+            Reporting.printTags(_mainWindowViewModel.PictureViewModel);
+        }
+
+        private void MenuItemHelp_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("documentation.bat");
         }
     }
 }

@@ -16,7 +16,7 @@ namespace PicDB.DataAccess
         public void SavePicture(Picture p)
         {
             string query = "INSERT INTO Picture (Id, Name, Image) OUTPUT INSERTED.Id " + "VALUES (NEWID(), @name, @image); ";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
 
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@name",p.Name);
@@ -27,7 +27,7 @@ namespace PicDB.DataAccess
             addPropertiesForPicture(p);
             addPropertiesToPictureMatchers(p);
 
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         private void addPropertiesForPicture(Picture p)
@@ -108,11 +108,11 @@ namespace PicDB.DataAccess
             Picture p = new Picture();
             p.ID = ID;
             string query = "delete from Picture WHERE Id = " + "@id";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
             var exifProps = GetPropertiesByIds(GetPropIds(p,0));
             if(exifProps == null)
             {
-                connection.Close();
+                if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
                 return;
             }
             var exifPropIds = GetPropIds(p, 0);
@@ -123,7 +123,7 @@ namespace PicDB.DataAccess
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@id", ID);
             cmd.ExecuteNonQuery();
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         private void deletePropertiesToPictureMatchers(Guid ID)
@@ -151,7 +151,7 @@ namespace PicDB.DataAccess
         {
             Picture p = new Picture();
             string query = "SELECT * from Picture WHERE Id = " + "@id";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
 
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@id", ID);
@@ -173,15 +173,16 @@ namespace PicDB.DataAccess
             p.IptcProperties = GetPropertiesByIds(GetPropIds(p,1));
             if(p.ExifProperties.Count == 0)
             {
-                connection.Close();
+                if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
                 return null;
             }
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
             return p;
         }
 
         private IList<Guid> GetPropIds(Picture p, int propertyType)
         {
+            if (connection.State == System.Data.ConnectionState.Closed) { connection.Open(); }
             IList<Guid> propIds = new List<Guid>();
             string matcherQuery = "SELECT PropertyDataID from PicturePropertyData WHERE PictureID = " + "@id" + " AND PropertyType = " + "@type";
             SqlCommand matcherCmd = getCommand(matcherQuery);
@@ -204,6 +205,7 @@ namespace PicDB.DataAccess
 
         private IList<Property> GetPropertiesByIds(IList<Guid> propIds)
         {
+            if (connection.State == System.Data.ConnectionState.Closed) { connection.Open(); }
             IList<Property> properties = new List<Property>();
             if (propIds.Count == 0)
             {
@@ -239,10 +241,10 @@ namespace PicDB.DataAccess
 
         public IList<Picture> GetAllPictures()
         {
+            if (connection.State == System.Data.ConnectionState.Closed) { connection.Open(); }
             IList<Picture> pictures = new List<Picture>();
             string query = "select * from Picture";
 
-            connection.Open();
             SqlCommand cmd = getCommand(query);
             using (var reader = cmd.ExecuteReader())
             {
@@ -261,7 +263,7 @@ namespace PicDB.DataAccess
                     pictures.Add(p);
                 }
             }
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
             return pictures;
         }
 
@@ -270,7 +272,7 @@ namespace PicDB.DataAccess
             IList<Photographer> photographers = new List<Photographer>();
             string query = "select * from Photographer";
 
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
 
             SqlCommand cmd = getCommand(query);
             using (var reader = cmd.ExecuteReader())
@@ -285,11 +287,16 @@ namespace PicDB.DataAccess
                     {
                         p.Birthday = reader.GetDateTime(3);
                     }
+                    if (!reader.IsDBNull(4))
+                    {
+                        p.Notes = reader.GetString(4);
+                    }
+                    
                     photographers.Add(p);
                 }
             }
 
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
             return photographers;
         }
 
@@ -297,7 +304,10 @@ namespace PicDB.DataAccess
         {
             Photographer p = new Photographer();
             string query = "SELECT * from Photographer WHERE Id = " + "@id";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed)
+            {
+                if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
+            }
 
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@id", ID);
@@ -312,16 +322,20 @@ namespace PicDB.DataAccess
                     {
                         p.Birthday = reader.GetDateTime(3);
                     }
+                    if (!reader.IsDBNull(4))
+                    {
+                        p.Notes = reader.GetString(4);
+                    }
+
                 }
             }
-            connection.Close();
             return p;
         }
 
         public void SavePhotographer(Photographer p)
         {
-            string query = "INSERT INTO Photographer (Id, FirstName, LastName, Birthday) " + "VALUES (NEWID(), @firstname, @lastname, @birthday); ";
-            connection.Open();
+            string query = "INSERT INTO Photographer (Id, FirstName, LastName, Birthday, Notes) " + "VALUES (NEWID(), @firstname, @lastname, @birthday, @notes); ";
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
 
             SqlCommand cmd = getCommand(query);
             if(p.FirstName != null)
@@ -343,26 +357,35 @@ namespace PicDB.DataAccess
                 cmd.Parameters.AddWithValue("@birthday", DBNull.Value);
 
             }
+            if(p.Notes != null)
+            {
+                cmd.Parameters.AddWithValue("@notes", p.Notes);
+            }
+            else
+            {
+                cmd.Parameters.AddWithValue("@notes",DBNull.Value);
+            }
+            
 
             cmd.ExecuteNonQuery();
 
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         public void DeletePhotographerById(Guid ID)
         {
             string query = "delete from Photographer WHERE Id = " + "@id";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@id", ID);
             cmd.ExecuteNonQuery();
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         public void UpdatePhotographer(Photographer p)
         {
             string query = "update Photographer set FirstName = @firstname, LastName = @lastname, Birthday = @birthday where Id = @id";
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
             SqlCommand cmd = getCommand(query);
             cmd.Parameters.AddWithValue("@firstname",p.FirstName);
             cmd.Parameters.AddWithValue("@lastname",p.LastName);
@@ -375,16 +398,25 @@ namespace PicDB.DataAccess
                 cmd.Parameters.AddWithValue("@birthday", DBNull.Value);
 
             }
+            if (p.Notes != null)
+            {
+                cmd.Parameters.AddWithValue("@notes", p.Notes);
+            }
+            else
+            {
+                cmd.Parameters.AddWithValue("@notes", DBNull.Value);
+            }
+
             cmd.Parameters.AddWithValue("id",p.ID);
             cmd.ExecuteNonQuery();
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         public void UpdatePicture(Picture p)
         {
-            connection.Open();
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
             UpdatePropertiesForPicture(p);
-            connection.Close();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
 
         private void UpdatePropertiesForPicture(Picture p)
@@ -415,6 +447,17 @@ namespace PicDB.DataAccess
                     prop.Changed = false;
                 }
             }
+        }
+
+        public void AssignPhotographerToPicture(Photographer p, Picture pic)
+        {
+            string query = "update Picture set PhotographerId = @photographerId where Id = @id";
+            if(connection.State == System.Data.ConnectionState.Closed){ connection.Open();}
+            SqlCommand cmd = getCommand(query);
+            cmd.Parameters.AddWithValue("@photographerId", p.ID);
+            cmd.Parameters.AddWithValue("@id", pic.ID);
+            cmd.ExecuteNonQuery();
+            if(connection.State == System.Data.ConnectionState.Open){ connection.Close();}
         }
     }
 }

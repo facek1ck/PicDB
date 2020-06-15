@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Command;
+using LinqToDB.SqlQuery;
 using PicDB.DataAccess;
 using PicDB.Model;
 using PicDB.View;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Text;
 
 namespace PicDB.ViewModel
@@ -24,6 +26,12 @@ namespace PicDB.ViewModel
         public ObservableCollection<Photographer> Photographers { get { return _photographers; } set { _photographers = value; } }
 
         private Photographer _currentPhotographer = new Photographer();
+
+        public void AssignPhotographer(Picture pic)
+        {
+            database.AssignPhotographerToPicture(CurrentPhotographer, pic);
+            clearCurrentPhotographer();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -73,7 +81,20 @@ namespace PicDB.ViewModel
             }
         }
 
- 
+        public string CurrentPhotographerNotes
+        {
+            get
+            {
+                return _currentPhotographer.Notes;
+            }
+
+            set
+            {
+                _currentPhotographer.Notes = value;
+            }
+        }
+
+
 
         public void AddPhotographer()
         {
@@ -82,7 +103,7 @@ namespace PicDB.ViewModel
                 database.SavePhotographer(_currentPhotographer);
                 Photographers = new ObservableCollection<Photographer>(database.GetAllPhotographers());
                 OnPropertyChanged("Photographers");
-                _currentPhotographer = new Photographer();
+                clearCurrentPhotographer();
             }
             else
             {
@@ -98,7 +119,7 @@ namespace PicDB.ViewModel
                 database.UpdatePhotographer(_currentPhotographer);
                 Photographers = new ObservableCollection<Photographer>(database.GetAllPhotographers());
                 OnPropertyChanged("Photographers");
-                _currentPhotographer = new Photographer();
+                clearCurrentPhotographer();
             }
             else
             {
@@ -109,10 +130,18 @@ namespace PicDB.ViewModel
 
         public void DeletePhotographer()
         {
-            database.DeletePhotographerById(_currentPhotographer.ID);
-            Photographers = new ObservableCollection<Photographer>(database.GetAllPhotographers());
-            OnPropertyChanged("Photographers");
-            _currentPhotographer = new Photographer();
+            try
+            {
+                database.DeletePhotographerById(_currentPhotographer.ID);
+                Photographers = new ObservableCollection<Photographer>(database.GetAllPhotographers());
+                OnPropertyChanged("Photographers");
+            }
+            catch (System.Data.SqlClient.SqlException)
+            {
+                System.Windows.MessageBox.Show("This Photographer has assigned images. Aborting!");
+            }
+            
+            clearCurrentPhotographer();
 
         }
 

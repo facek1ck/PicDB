@@ -1,4 +1,5 @@
-﻿using PicDB.ViewModel;
+﻿using PicDB.Model;
+using PicDB.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,39 +14,24 @@ using System.Windows.Shapes;
 
 namespace PicDB.View
 {
-    /// <summary>
-    /// Interaktionslogik für PhotographerAddWindow.xaml
-    /// </summary>
-    public partial class PhotographerAddWindow : Window
+    public partial class AssignPhotographerWindow : Window
     {
+        MainWindowViewModel _mainWindowViewModel;
         PhotographerViewModel _photographerViewModel;
-        bool _edit;
-        public PhotographerAddWindow(PhotographerViewModel photographerViewModel, bool edit)
+        Picture _pic;
+        public AssignPhotographerWindow(MainWindowViewModel mainWindowViewModel, PhotographerViewModel photographerViewModel, Picture pic)
         {
+            _mainWindowViewModel = mainWindowViewModel;
             _photographerViewModel = photographerViewModel;
-            _edit = edit;
+            _pic = pic;
             DataContext = photographerViewModel;
-            if (edit)
-            {
-                Title = "Edit Photographer";
-            }
-            else
-            {
-                Title = "Add Photographer";
-            }
             InitializeComponent();
         }
 
         private void btnDialogOk_Click(object sender, RoutedEventArgs e)
         {
-            if (!_edit)
-            {
-                _photographerViewModel.AddPhotographer();
-            }
-            else
-            {
-                _photographerViewModel.EditPhotographer();
-            }
+            _photographerViewModel.AssignPhotographer(_pic);
+            _mainWindowViewModel.PictureViewModel.reloadImages();
             _photographerViewModel.clearCurrentPhotographer();
             this.Close();
         }

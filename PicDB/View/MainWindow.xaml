@@ -18,18 +18,20 @@
             <MenuItem Header="_File" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65">
                 <MenuItem Header="Add Image" Click="MenuItemNew_Click"/>
                 <MenuItem Header="Delete Selected" Click="MenuItemDelete_Click" />
-                <MenuItem Header="_Save" />
                 <Separator />
-                <MenuItem Header="_Exit" />
+                <MenuItem Header="_Exit" Click="MenuItemExit_Click" />
             </MenuItem>
             <MenuItem Header="_Photographer" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="100">
                 <MenuItem Header="List Photographers" Click="MenuItemShowPhotographers_Click"/>
                 <MenuItem Header="Add Photographer" Click="MenuItemAddPhotographer_Click"/>
+                <MenuItem Header="Assign Photographer" Click="MenuItemAssignPhotographer_Click"/>
             </MenuItem>
 
             <MenuItem Header="_Reports" BorderThickness="0,0,1,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="65">
+                <MenuItem Header="Current Picture" Click="MenuItemPictureReport_Click"/>
+                <MenuItem Header="Tag Summary" Click="MenuItemTagReport_Click"/>
             </MenuItem>
-            <MenuItem Header="_Help" HorizontalAlignment="Right" BorderThickness="1,0,0,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="67">
+            <MenuItem Header="_Help" HorizontalAlignment="Right" BorderThickness="1,0,0,0" BorderBrush="Black" FontSize="14" Margin="0,0,0,0" Width="67" Click="MenuItemHelp_Click">
 
             </MenuItem>
         </Menu>
@@ -61,7 +63,7 @@
                     </GridSplitter.Template>
                 </GridSplitter>
                 <TabControl x:Name="tabControl" Grid.Column="2" SelectedIndex="{Binding SelectedTab}">
-                    <TabItem Header="EXIF">
+                    <TabItem Header="EXIF" IsEnabled="{Binding ExifEmpty}">
                         <Grid Background="White" Height="Auto" Width="Auto">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -75,7 +77,7 @@
                             <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right" Margin="10,5,5,10" VerticalAlignment="Center" Width="Auto" FontSize="14" IsEnabled="{Binding Changed}" Click="Save_Click"/>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="IPTC">
+                    <TabItem Header="IPTC" IsEnabled="{Binding IptcEmpty}">
                         <Grid Background="White" Height="Auto" Width="Auto">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>

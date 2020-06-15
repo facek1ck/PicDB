@@ -9,7 +9,11 @@ namespace PicDB.Model
         public Guid ID { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
-
         public DateTime? Birthday { get; set; }
+        public String Notes { get; set; }
+        public override string ToString()
+        {
+            return LastName + " " + FirstName;
+        }
     }
 }

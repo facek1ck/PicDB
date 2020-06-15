@@ -1,12 +1,10 @@
-﻿using ExifLib;
-using MetadataExtractor;
+﻿using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using MetadataExtractor.Formats.Iptc;
 using Microsoft.Win32;
 using PicDB.DataAccess;
 using PicDB.Model;
 using Serilog;
-using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,14 +12,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using PicDB.Helpers;
 using Image = System.Windows.Controls.Image;
+using System.Text;
 
 namespace PicDB.ViewModel
 {
@@ -38,6 +32,11 @@ namespace PicDB.ViewModel
             InitPictures();
         }
 
+        internal void reloadImages()
+        {
+            Images = database.GetAllPictures();
+        }
+
         private void InitPictures()
         {
             Log.Information("[Picture Data] - Picture Data Initialization...");
@@ -49,7 +48,7 @@ namespace PicDB.ViewModel
             if (ListBoxThumbnails.Count() > 0)
             {
                 SelectedThumbnail = (ViewImage)ListBoxThumbnails[0];
-                SelectedImageSource = FromBase64(Images[0].Image);
+                SelectedImageSource = Conversion.FromBase64(Images[0].Image);
             }
             
 
@@ -69,26 +68,14 @@ namespace PicDB.ViewModel
 
         private ViewImage CreateViewImage(Picture p)
         {
-            Image image = new Image() { Source = FromBase64(p.Image), Stretch = Stretch.Uniform };
+            Image image = new Image() { Source = Conversion.FromBase64(p.Image), Stretch = Stretch.Uniform };
             ViewImage viewImage = new ViewImage();
             viewImage.Picture = p;
             viewImage.Image = image.Source;
             return viewImage;
         }
 
-        private BitmapImage FromBase64(string base64)
-        {
-            using (var stream = new MemoryStream(Convert.FromBase64String(base64)))
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = stream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
-            }
-        }
+
 
         private void FillImagesList()
         {
@@ -141,6 +128,8 @@ namespace PicDB.ViewModel
                     OnPropertyChanged("CurrentComment");
                     OnPropertyChanged("Props");
                     OnPropertyChanged("Changed");
+                    OnPropertyChanged("ExifEmpty");
+                    OnPropertyChanged("IptcEmpty");
                 }
                 else
                 {
@@ -450,21 +439,22 @@ namespace PicDB.ViewModel
         private IList<Picture> FilterImages(string searchString)
         {
             searchString = searchString.ToUpper();
-            //return Images.Where(p => /*p.Photographer != null && (
-            //                        p.Photographer.FirstName.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
-            //                        p.Photographer.LastName.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||*/
-            //                        p.ExifProperties.All(tag => tag.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
-            //                                                    tag.Comment.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0
-            //                                            ) ||
-            //                        p.IptcProperties.All(tag => tag.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 ||
-            //                                                    tag.Comment.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0
-            //                                            )
-            //                        ).ToList();
-
-
-            return Images.Where( i => i.ExifProperties.Any(z => z.Value.ToUpper().Contains(searchString))
+            return Images.Where( i => i.ExifProperties.Any(z => z.Value.ToUpper().Contains(searchString) 
+            || i.IptcProperties.Any(z => z.Value.ToUpper().Contains(searchString)) 
+            || (i.Photographer != null && ((i.Photographer.FirstName+" " + i.Photographer.LastName).ToUpper().Contains(searchString))))
             ).ToList();
 
         }
+
+        public bool ExifEmpty //true if not empty
+        {
+            get { return SelectedThumbnail.Picture.ExifProperties.Count > 0; }
+        }
+        public bool IptcEmpty //true if not empty
+        {
+            get { return SelectedThumbnail.Picture.IptcProperties.Count > 0; }
+        }
+
+        
     }
 }
