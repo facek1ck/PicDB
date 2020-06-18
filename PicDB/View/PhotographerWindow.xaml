@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PicDB.View"
         mc:Ignorable="d"
-        Title="PhotographerWindow" Height="200" Width="400">
+        Title="Photographers" Height="200" Width="560">
     <Grid DataContext="{Binding PhotographerViewModel}">
         <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Path=Photographers}" SelectedItem="{Binding CurrentPhotographer}"
                   >

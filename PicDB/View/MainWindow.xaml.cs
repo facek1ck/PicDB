@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Configuration;
+using System.Diagnostics;
 using System.Windows;
 using PicDB.Helpers;
 using PicDB.View;
@@ -75,7 +76,7 @@ namespace PicDB
 
         private void MenuItemHelp_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("documentation.bat");
+            Process.Start(ConfigurationManager.AppSettings["documentation:location"]);
         }
     }
 }

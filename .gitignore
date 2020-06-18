@@ -173,7 +173,7 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 
 # SQL Server files
-#*.mdf
+*.mdf
 *.ldf
 
 # Business Intelligence projects
@@ -191,3 +191,5 @@ StyleCop.Cache
 bin
 obj
 .vs/
+
+log/
